@@ -198,26 +198,40 @@ input[type="range"]:active::-webkit-slider-thumb{transform:scale(1.15);}
   border-radius:20px;padding:3px 10px;display:inline-block;
 }
 
-/* タイムラインバーグラフ */
-.tl-bar-wrap{
-  position:relative;
-  background:rgba(0,0,0,0.08);
-  border-radius:4px;height:10px;
-  overflow:hidden;margin-top:8px;
+/* グラフカード */
+.chart-card{border-top:3px solid var(--gold);}
+.chart-legend{
+  display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;
 }
-.tl-bar{
-  height:100%;border-radius:4px;
-  transition:width 0.6s cubic-bezier(0.34,1.2,0.64,1);
+.cl-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text);}
+.cl-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+
+/* ボタン行 */
+.btn-row{
+  display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;justify-content:center;
 }
-.tl-bar-red  {background:var(--red);}
-.tl-bar-green{background:var(--green);}
-/* STEP3：現状ラインを薄く重ねる */
-.tl-bar-base{
-  position:absolute;top:0;left:0;
-  width:60%;height:100%;
-  background:rgba(0,0,0,0.12);
-  border-radius:4px;
-  border-right:2px dashed rgba(0,0,0,0.2);
+.btn-print{
+  background:var(--gold);border:none;color:var(--navy);
+  font-family:'Noto Sans JP',sans-serif;font-weight:700;
+  font-size:12px;padding:10px 24px;border-radius:40px;
+  cursor:pointer;transition:all .2s;
+}
+.btn-print:hover{background:var(--goldL);}
+
+/* ── 印刷CSS ── */
+@media print {
+  body{background:white !important;padding:10px;}
+  .btn-row,.sl-ticks,input[type="range"]{display:none !important;}
+  .step-card{box-shadow:none;border:1px solid #ddd;margin-bottom:10px;padding:16px;}
+  header h1{color:var(--navy) !important;}
+  header p{color:#666 !important;}
+  header .h-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .step-num,.fear-badge,.goal-badge,.ft-box,.gt-box,.action-box,
+  .now-sales-bar,.fear-lost,.goal-summary,.insight-box{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  canvas{max-width:100%;}
+  footer{color:#999 !important;}
 }
 
 /* リセット・フッター */
@@ -309,25 +323,16 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
       <div class="ft-label">📅 1年後の売上</div>
       <div class="ft-val" id="fear-1y">—</div>
       <div class="ft-diff" id="fear-1y-d">—</div>
-      <div class="tl-bar-wrap">
-        <div class="tl-bar tl-bar-red" id="fear-bar-1y" style="width:100%"></div>
-      </div>
     </div>
     <div class="ft-box ft-2">
       <div class="ft-label">📅 3年後の売上</div>
       <div class="ft-val" id="fear-3y">—</div>
       <div class="ft-diff" id="fear-3y-d">—</div>
-      <div class="tl-bar-wrap">
-        <div class="tl-bar tl-bar-red" id="fear-bar-3y" style="width:100%"></div>
-      </div>
     </div>
     <div class="ft-box ft-3">
       <div class="ft-label">📅 5年後の売上</div>
       <div class="ft-val" id="fear-5y">—</div>
       <div class="ft-diff" id="fear-5y-d">—</div>
-      <div class="tl-bar-wrap">
-        <div class="tl-bar tl-bar-red" id="fear-bar-5y" style="width:100%"></div>
-      </div>
     </div>
   </div>
 
@@ -397,10 +402,6 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
       <div class="gt-arrow">↓</div>
       <div class="gt-val" id="goal-1y">—</div>
       <div class="gt-diff" id="goal-1y-d">—</div>
-      <div class="tl-bar-wrap" style="margin-top:8px;">
-        <div class="tl-bar-base"></div>
-        <div class="tl-bar tl-bar-green" id="goal-bar-1y" style="width:100%"></div>
-      </div>
     </div>
     <div class="gt-box gt-2">
       <div class="gt-label">📈 3年後</div>
@@ -408,10 +409,6 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
       <div class="gt-arrow">↓</div>
       <div class="gt-val" id="goal-3y">—</div>
       <div class="gt-diff" id="goal-3y-d">—</div>
-      <div class="tl-bar-wrap" style="margin-top:8px;">
-        <div class="tl-bar-base"></div>
-        <div class="tl-bar tl-bar-green" id="goal-bar-3y" style="width:100%"></div>
-      </div>
     </div>
     <div class="gt-box gt-3">
       <div class="gt-label">📈 5年後</div>
@@ -419,10 +416,6 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
       <div class="gt-arrow">↓</div>
       <div class="gt-val" id="goal-5y">—</div>
       <div class="gt-diff" id="goal-5y-d">—</div>
-      <div class="tl-bar-wrap" style="margin-top:8px;">
-        <div class="tl-bar-base"></div>
-        <div class="tl-bar tl-bar-green" id="goal-bar-5y" style="width:100%"></div>
-      </div>
     </div>
   </div>
 
@@ -433,7 +426,31 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
   </div>
 </div>
 
-<button class="btn-reset" onclick="resetAll()">↺ リセット</button>
+<!-- ══ グラフカード ══ -->
+<div class="step-card chart-card" id="chart-card">
+  <div class="step-label">
+    <div class="step-num" style="background:var(--gold);color:var(--navy);">📊</div>
+    <div>
+      <div class="step-title">売上シミュレーション：放置 vs 改善</div>
+      <div class="step-sub">現状・1年後・3年後・5年後の売上変化を比較しています</div>
+    </div>
+  </div>
+
+  <!-- 凡例 -->
+  <div class="chart-legend">
+    <div class="cl-item"><span class="cl-dot" style="background:var(--navy)"></span>現状</div>
+    <div class="cl-item"><span class="cl-dot" style="background:var(--red)"></span>放置シナリオ</div>
+    <div class="cl-item"><span class="cl-dot" style="background:var(--green)"></span>改善シナリオ</div>
+  </div>
+
+  <canvas id="salesChart" style="width:100%;height:260px;"></canvas>
+</div>
+
+<!-- ボタン群 -->
+<div class="btn-row">
+  <button class="btn-reset" onclick="resetAll()">↺ リセット</button>
+  <button class="btn-print" onclick="window.print()">🖨️ 印刷・PDF保存</button>
+</div>
 <footer>Smile Plus Consulting ／ 売上みっけ！</footer>
 
 <script>
@@ -544,10 +561,116 @@ function calcStep3(sales, b){
   $('insight-text').textContent = msg;
 }
 
+// ── グラフ描画 ──
+function drawChart(sales, fearData, goalData){
+  const canvas = document.getElementById('salesChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 260;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const PAD = {top:20, right:20, bottom:40, left:70};
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  // データ
+  const labels = ['現状', '1年後', '3年後', '5年後'];
+  const nowArr  = [sales, sales, sales, sales];
+  const fearArr = [sales, fearData.y1, fearData.y3, fearData.y5];
+  const goalArr = [sales, goalData.y1, goalData.y3, goalData.y5];
+
+  const allVals = [...fearArr, ...goalArr];
+  const maxVal  = Math.max(...allVals) * 1.1;
+  const minVal  = Math.min(...fearArr) * 0.85;
+  const range   = maxVal - minVal;
+
+  const toY = v => PAD.top + cH - ((v - minVal) / range) * cH;
+  const toX = i => PAD.left + (i / 3) * cW;
+
+  // 背景
+  ctx.fillStyle = '#f8f9fc';
+  ctx.fillRect(0, 0, W, H);
+
+  // グリッド線
+  ctx.strokeStyle = '#e0e4ef';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = PAD.top + (i/4)*cH;
+    ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(PAD.left+cW,y);ctx.stroke();
+    const v = maxVal - (i/4)*range;
+    ctx.fillStyle = '#aaa';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText((v/10000).toFixed(0)+'万', PAD.left-6, y+4);
+  }
+
+  // X軸ラベル
+  labels.forEach((lb,i)=>{
+    const x = toX(i);
+    ctx.fillStyle = '#666';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(lb, x, H - PAD.bottom + 16);
+  });
+
+  // 現状ライン（破線 ネイビー）
+  ctx.strokeStyle = '#223670';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  ctx.moveTo(PAD.left, toY(sales));
+  ctx.lineTo(PAD.left+cW, toY(sales));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 折れ線 描画関数
+  function drawLine(arr, color, lw){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    arr.forEach((v,i)=>{ i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)); });
+    ctx.stroke();
+    // 点
+    arr.forEach((v,i)=>{
+      ctx.beginPath();
+      ctx.arc(toX(i),toY(v),5,0,Math.PI*2);
+      ctx.fillStyle = color;ctx.fill();
+      ctx.strokeStyle='white';ctx.lineWidth=2;ctx.stroke();
+      // 数値ラベル
+      ctx.fillStyle = color;
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      const label = (v/10000).toFixed(0)+'万';
+      const offset = color.includes('1a7a') ? -14 : 14;
+      ctx.fillText(label, toX(i), toY(v)+offset);
+    });
+  }
+
+  drawLine(fearArr, '#c0392b', 2.5);
+  drawLine(goalArr, '#1a7a4a', 2.5);
+}
+
+
 function calc(){
   const {b, sales} = calcStep1();
+  const fearRate = parseFloat($('sl-fear').value);
+  const f1=Math.pow(1-fearRate/100,12),f3=Math.pow(1-fearRate/100,36),f5=Math.pow(1-fearRate/100,60);
+  const fearData = {y1:sales*f1, y3:sales*f3, y5:sales*f5};
+  const gr = parseInt($('sl-goal').value);
+  const goalData = {
+    y1:sales*Math.pow(1+gr/100,12),
+    y3:sales*Math.pow(1+gr/100,36),
+    y5:sales*Math.pow(1+gr/100,60)
+  };
   calcStep2(sales, b);
   calcStep3(sales, b);
+  drawChart(sales, fearData, goalData);
 }
 
 function resetAll(){
