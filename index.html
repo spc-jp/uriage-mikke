@@ -651,6 +651,13 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
     </div>
   </div>
 
+  <!-- 残り回数バッジ -->
+  <div id="free-count-badge" style="
+    text-align:center;font-size:12px;font-weight:700;color:white;
+    background:#6c3fc0;border-radius:20px;padding:6px 16px;
+    margin-bottom:10px;display:inline-block;width:100%;
+  ">無料あと 3 回 / 3回</div>
+
   <!-- 生成ボタン -->
   <button class="btn-generate" id="btn-generate" onclick="generatePlan()">
     ✨ アクションプラン・事業計画を生成する
@@ -704,7 +711,63 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
 </div>
 
 
-<div class="btn-row">
+<!-- ══ パスワード解除モーダル ══ -->
+<div id="unlock-modal" style="
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.6);z-index:9999;
+  align-items:center;justify-content:center;padding:20px;
+">
+  <div style="
+    background:white;border-radius:20px;padding:28px 24px;
+    max-width:400px;width:100%;text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  ">
+    <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+    <div style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:#223670;margin-bottom:8px;">
+      無料利用回数を使い切りました
+    </div>
+    <div style="font-size:13px;color:#666;line-height:1.7;margin-bottom:20px;">
+      無料プランはAI生成が月3回までです。<br>
+      プロ版（月額2,980円）にアップグレードすると<br>
+      <strong>AI生成が無制限</strong>でご利用いただけます。
+    </div>
+
+    <!-- Stripeリンク -->
+    <a href="https://buy.stripe.com/YOUR_STRIPE_LINK" target="_blank" style="
+      display:block;background:linear-gradient(135deg,#6c3fc0,#4a2a8c);
+      color:white;font-weight:700;font-size:14px;
+      padding:14px;border-radius:12px;text-decoration:none;
+      margin-bottom:16px;
+    ">💳 プロ版にアップグレード（月額2,980円）</a>
+
+    <!-- パスワード入力 -->
+    <div style="font-size:12px;color:#888;margin-bottom:8px;">
+      購入済みの方はパスワードを入力してください
+    </div>
+    <input id="unlock-input" type="password" placeholder="パスワードを入力"
+      style="
+        width:100%;border:2px solid #dde2f0;border-radius:10px;
+        padding:10px 14px;font-size:14px;outline:none;
+        text-align:center;margin-bottom:8px;
+      "
+      onkeydown="if(event.key==='Enter')tryUnlock()"
+    >
+    <div id="unlock-error" style="display:none;color:#c0392b;font-size:12px;margin-bottom:8px;">
+      パスワードが正しくありません
+    </div>
+    <button onclick="tryUnlock()" style="
+      width:100%;background:#D0A900;border:none;color:#223670;
+      font-weight:700;font-size:14px;padding:12px;border-radius:10px;
+      cursor:pointer;margin-bottom:12px;
+    ">🔓 解除する</button>
+
+    <button onclick="closeUnlockModal()" style="
+      background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;
+    ">閉じる</button>
+  </div>
+</div>
+
+
   <button class="btn-reset" onclick="resetAll()">↺ リセット・トップへ</button>
   <button class="btn-print" onclick="window.print()">🖨️ 印刷・PDF保存</button>
 </div>
@@ -824,6 +887,55 @@ function getSelected(group){
   return el ? el.textContent.trim() : null;
 }
 
+// ── 無料利用回数の管理 ──
+const STORAGE_KEY = 'uriage_mikke_count';
+const MAX_FREE    = 3;
+const UNLOCK_PASS = 'spc2024'; // ← Stripeのサンクスページで公開するパスワード
+
+function getCount(){ return parseInt(localStorage.getItem(STORAGE_KEY)||'0'); }
+function addCount(){ localStorage.setItem(STORAGE_KEY, getCount()+1); }
+function isUnlocked(){ return localStorage.getItem('uriage_mikke_unlocked')==='yes'; }
+function unlock(pass){
+  if(pass===UNLOCK_PASS){
+    localStorage.setItem('uriage_mikke_unlocked','yes');
+    return true;
+  }
+  return false;
+}
+
+// 残り回数バッジを更新
+function updateCountBadge(){
+  const el = $('free-count-badge');
+  if(!el) return;
+  if(isUnlocked()){
+    el.textContent = '✅ プロ版：無制限利用中';
+    el.style.background = '#1a7a4a';
+  } else {
+    const left = Math.max(0, MAX_FREE - getCount());
+    el.textContent = `無料あと ${left} 回 / ${MAX_FREE}回`;
+    el.style.background = left===0 ? '#c0392b' : '#6c3fc0';
+  }
+}
+
+// パスワード解除モーダル表示
+function showUnlockModal(){
+  $('unlock-modal').style.display = 'flex';
+}
+function closeUnlockModal(){
+  $('unlock-modal').style.display = 'none';
+}
+function tryUnlock(){
+  const pass = $('unlock-input').value.trim();
+  if(unlock(pass)){
+    closeUnlockModal();
+    updateCountBadge();
+    alert('✅ プロ版が有効になりました！AI生成が無制限でご利用いただけます。');
+    generatePlan();
+  } else {
+    $('unlock-error').style.display = 'block';
+  }
+}
+
 // ── API呼び出し・プラン生成 ──
 async function generatePlan(){
   const gyoshu  = getSelected('gyoshu');
@@ -835,6 +947,17 @@ async function generatePlan(){
   if(!gyoshu||!chiiki||!jugyoin||!nayami){
     alert('業種・地域・従業員数・一番の悩みを選んでください');
     return;
+  }
+
+  // ── 回数チェック ──
+  if(!isUnlocked()){
+    const count = getCount();
+    if(count >= MAX_FREE){
+      showUnlockModal();
+      return;
+    }
+    addCount();
+    updateCountBadge();
   }
 
   // 数値データ収集
@@ -1134,6 +1257,7 @@ function resetAll(){
   $(id).addEventListener('input',calc);
 });
 
+updateCountBadge();
 calc();
 </script>
 </body>
