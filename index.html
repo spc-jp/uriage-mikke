@@ -198,7 +198,101 @@ input[type="range"]:active::-webkit-slider-thumb{transform:scale(1.15);}
   border-radius:20px;padding:3px 10px;display:inline-block;
 }
 
-/* グラフカード */
+/* ── STEP4 ── */
+.step4{border-top:3px solid #6c3fc0;}
+.s4-section{margin-bottom:16px;}
+.s4-label{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.btn-select-group{display:flex;flex-wrap:wrap;gap:8px;}
+.btn-select{
+  background:var(--gray);border:2px solid transparent;
+  color:var(--text);font-family:'Noto Sans JP',sans-serif;
+  font-size:12px;font-weight:700;padding:8px 14px;
+  border-radius:20px;cursor:pointer;transition:all .2s;
+}
+.btn-select:hover{border-color:#6c3fc0;color:#6c3fc0;}
+.btn-select.active{background:#6c3fc0;color:white;border-color:#6c3fc0;}
+.btn-select-lg{font-size:13px;padding:10px 18px;}
+
+.s4-textarea{
+  width:100%;min-height:80px;border:2px solid #dde2f0;border-radius:12px;
+  padding:10px 14px;font-family:'Noto Sans JP',sans-serif;font-size:13px;
+  color:var(--text);outline:none;resize:vertical;transition:border-color .2s;
+}
+.s4-textarea:focus{border-color:#6c3fc0;}
+
+.btn-generate{
+  width:100%;background:linear-gradient(135deg,#6c3fc0,#4a2a8c);
+  border:none;color:white;font-family:'Noto Sans JP',sans-serif;
+  font-weight:700;font-size:15px;padding:16px;border-radius:14px;
+  cursor:pointer;transition:all .2s;margin-top:4px;
+  box-shadow:0 4px 16px rgba(108,63,192,.3);
+}
+.btn-generate:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,63,192,.4);}
+.btn-generate:disabled{background:#ccc;transform:none;box-shadow:none;cursor:not-allowed;}
+
+/* ローディング */
+.loading-dots{display:flex;justify-content:center;gap:8px;}
+.loading-dots span{
+  width:12px;height:12px;background:#6c3fc0;border-radius:50%;
+  animation:dot-bounce .8s infinite ease-in-out;
+}
+.loading-dots span:nth-child(2){animation-delay:.15s;}
+.loading-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes dot-bounce{0%,80%,100%{transform:scale(0.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+
+/* 出力カード */
+.output-card{border-top:3px solid #6c3fc0;}
+.out-header{
+  background:linear-gradient(135deg,var(--navy),var(--navyL));
+  border-radius:14px;padding:18px 20px;margin-bottom:16px;
+}
+.out-title{
+  font-family:'Oswald',sans-serif;font-size:22px;
+  font-weight:700;color:var(--white);margin-bottom:4px;
+}
+.out-meta{font-size:11px;color:rgba(255,255,255,.65);line-height:1.7;}
+
+.out-section{margin-bottom:20px;}
+.out-sec-title{
+  font-size:13px;font-weight:700;color:var(--navy);
+  border-left:4px solid var(--gold);padding-left:10px;
+  margin-bottom:10px;
+}
+.out-text{font-size:13px;color:var(--text);line-height:1.9;white-space:pre-line;}
+
+/* アクションカード */
+.action-plan-card{
+  background:var(--gray);border-radius:12px;
+  padding:14px 16px;margin-bottom:10px;
+  border-left:4px solid #6c3fc0;
+}
+.apc-num{
+  display:inline-block;background:#6c3fc0;color:white;
+  font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:10px;margin-bottom:6px;
+}
+.apc-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.apc-body{font-size:12px;color:#555;line-height:1.7;}
+.apc-effect{
+  display:inline-block;background:#e8f8f0;color:var(--green);
+  font-size:11px;font-weight:700;padding:3px 10px;
+  border-radius:10px;margin-top:6px;
+}
+
+/* 数値テーブル */
+.num-table{width:100%;border-collapse:collapse;font-size:12px;}
+.num-table th{
+  background:var(--navy);color:white;
+  padding:8px 12px;text-align:center;font-size:11px;
+}
+.num-table td{
+  padding:8px 12px;text-align:right;border-bottom:1px solid #eee;
+}
+.num-table td:first-child{text-align:left;font-weight:700;color:var(--navy);}
+.num-table tr.goal-row td{color:var(--green);font-weight:700;}
+.num-table tr.fear-row td{color:var(--red);}
+
+/* リセット・フッター */
 .chart-card{border-top:3px solid var(--gold);}
 .chart-legend{
   display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;
@@ -446,7 +540,122 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
   <canvas id="salesChart" style="width:100%;height:260px;"></canvas>
 </div>
 
-<!-- ボタン群 -->
+<!-- ══ STEP 4 ══ -->
+<div class="step-card step4">
+  <div class="step-label">
+    <div class="step-num" style="background:#6c3fc0;color:white;">4</div>
+    <div>
+      <div class="step-title">AIがアクションプランと事業計画を作成します</div>
+      <div class="step-sub">業種と悩みを選ぶだけで、Claudeが具体的な提案を生成します</div>
+    </div>
+  </div>
+
+  <!-- 業種選択 -->
+  <div class="s4-section">
+    <div class="s4-label">📂 業種を選んでください</div>
+    <div class="btn-select-group" id="gyoshu-group">
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🍽️ 飲食</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">✂️ 美容・サロン</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🛍️ 小売</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🏭 製造</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🏥 医療・介護</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">⚖️ 士業</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🏗️ 建設・工事</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">💼 サービス業</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">🖥️ IT・Web</button>
+      <button class="btn-select" data-group="gyoshu" onclick="selectBtn(this)">📦 その他</button>
+    </div>
+  </div>
+
+  <!-- 地域 -->
+  <div class="s4-section">
+    <div class="s4-label">📍 地域</div>
+    <div class="btn-select-group">
+      <button class="btn-select" data-group="chiiki" onclick="selectBtn(this)">🏙️ 都市部</button>
+      <button class="btn-select" data-group="chiiki" onclick="selectBtn(this)">🏘️ 地方・郊外</button>
+      <button class="btn-select" data-group="chiiki" onclick="selectBtn(this)">🌏 オンライン中心</button>
+    </div>
+  </div>
+
+  <!-- 従業員数 -->
+  <div class="s4-section">
+    <div class="s4-label">👥 従業員数（本人含む）</div>
+    <div class="btn-select-group">
+      <button class="btn-select" data-group="jugyoin" onclick="selectBtn(this)">1人（ひとり社長）</button>
+      <button class="btn-select" data-group="jugyoin" onclick="selectBtn(this)">2〜5人</button>
+      <button class="btn-select" data-group="jugyoin" onclick="selectBtn(this)">6〜10人</button>
+      <button class="btn-select" data-group="jugyoin" onclick="selectBtn(this)">11〜30人</button>
+      <button class="btn-select" data-group="jugyoin" onclick="selectBtn(this)">31人以上</button>
+    </div>
+  </div>
+
+  <!-- 強み -->
+  <div class="s4-section">
+    <div class="s4-label">💪 お店・会社の強みや特徴（自由に記入）</div>
+    <textarea id="tsuyomi" class="s4-textarea" placeholder="例：創業30年のベテラン職人が在籍、地域密着で口コミが強い、独自の製法で他社との差別化ができている…"></textarea>
+  </div>
+
+  <!-- 一番の悩み -->
+  <div class="s4-section">
+    <div class="s4-label">😟 今一番改善したいことは？</div>
+    <div class="btn-select-group">
+      <button class="btn-select btn-select-lg" data-group="nayami" onclick="selectBtn(this)">👥 客数を増やしたい</button>
+      <button class="btn-select btn-select-lg" data-group="nayami" onclick="selectBtn(this)">💴 単価を上げたい</button>
+      <button class="btn-select btn-select-lg" data-group="nayami" onclick="selectBtn(this)">🔁 来店頻度を増やしたい</button>
+    </div>
+  </div>
+
+  <!-- 生成ボタン -->
+  <button class="btn-generate" id="btn-generate" onclick="generatePlan()">
+    ✨ アクションプラン・事業計画を生成する
+  </button>
+</div>
+
+<!-- ══ 出力カード ══ -->
+<div class="step-card output-card" id="output-card" style="display:none;">
+  <!-- ローディング -->
+  <div id="output-loading" style="text-align:center;padding:30px 0;">
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:#888;">Claudeが分析中です…少々お待ちください</div>
+  </div>
+
+  <!-- 出力本体 -->
+  <div id="output-body" style="display:none;">
+    <!-- ヘッダー -->
+    <div class="out-header">
+      <div class="out-title" id="out-title">事業改善計画書</div>
+      <div class="out-meta" id="out-meta"></div>
+    </div>
+
+    <!-- 現状サマリー -->
+    <div class="out-section">
+      <div class="out-sec-title">📊 現状分析</div>
+      <div class="out-text" id="out-analysis"></div>
+    </div>
+
+    <!-- アクションプラン -->
+    <div class="out-section">
+      <div class="out-sec-title">🎯 3ヶ月以内のアクションプラン</div>
+      <div id="out-actions"></div>
+    </div>
+
+    <!-- 事業計画 -->
+    <div class="out-section">
+      <div class="out-sec-title">📈 売上目標と事業計画</div>
+      <div class="out-text" id="out-bizplan"></div>
+    </div>
+
+    <!-- 数値計画 -->
+    <div class="out-section">
+      <div class="out-sec-title">💹 数値計画（シミュレーション連動）</div>
+      <div id="out-numbers"></div>
+    </div>
+  </div>
+</div>
+
+
 <div class="btn-row">
   <button class="btn-reset" onclick="resetAll()">↺ リセット</button>
   <button class="btn-print" onclick="window.print()">🖨️ 印刷・PDF保存</button>
@@ -555,7 +764,162 @@ function calcStep3(sales, b){
   $('insight-text').textContent = msg;
 }
 
-// ── グラフ描画 ──
+// ── STEP4 ボタン選択 ──
+function selectBtn(el){
+  const group = el.dataset.group;
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function getSelected(group){
+  const el = document.querySelector(`[data-group="${group}"].active`);
+  return el ? el.textContent.trim() : null;
+}
+
+// ── API呼び出し・プラン生成 ──
+async function generatePlan(){
+  const gyoshu  = getSelected('gyoshu');
+  const chiiki  = getSelected('chiiki');
+  const jugyoin = getSelected('jugyoin');
+  const nayami  = getSelected('nayami');
+  const tsuyomi = $('tsuyomi').value.trim();
+
+  if(!gyoshu||!chiiki||!jugyoin||!nayami){
+    alert('業種・地域・従業員数・一番の悩みを選んでください');
+    return;
+  }
+
+  // 数値データ収集
+  const b = getBase();
+  const sales = b.kyaku * b.tanka * b.hindo;
+  const gr = parseInt($('sl-goal').value);
+  const g1 = Math.round(sales * Math.pow(1+gr/100,12));
+  const g3 = Math.round(sales * Math.pow(1+gr/100,36));
+  const g5 = Math.round(sales * Math.pow(1+gr/100,60));
+  const fearRate = parseFloat($('sl-fear').value);
+  const f1val = Math.round(sales * Math.pow(1-fearRate/100,12));
+
+  // UI制御
+  $('btn-generate').disabled = true;
+  $('btn-generate').textContent = '生成中...';
+  $('output-card').style.display = 'block';
+  $('output-loading').style.display = 'block';
+  $('output-body').style.display = 'none';
+  $('output-card').scrollIntoView({behavior:'smooth', block:'start'});
+
+  const prompt = `
+あなたは中小企業の経営改善コンサルタントです。
+以下の情報をもとに、アクションプランと事業計画を作成してください。
+
+【企業情報】
+・業種：${gyoshu}
+・地域：${chiiki}
+・従業員数：${jugyoin}
+・強み・特徴：${tsuyomi || '特になし'}
+・最重要課題：${nayami}
+
+【現状の売上データ】
+・年間売上：${fmt(sales)}円
+・客数：${fmt(b.kyaku)}人
+・客単価：${fmt(b.tanka)}円
+・年間頻度：${b.hindo}回
+
+【シミュレーション目標】
+・毎月+${gr}%改善目標
+・1年後目標売上：${fmt(g1)}円
+・3年後目標売上：${fmt(g3)}円
+・5年後目標売上：${fmt(g5)}円
+・放置した場合の1年後：${fmt(f1val)}円
+
+以下のJSON形式で回答してください。他のテキストは一切含めないでください。
+
+{
+  "analysis": "現状分析（3〜4文。業種・地域・従業員数・課題を踏まえた具体的な分析）",
+  "actions": [
+    {
+      "title": "施策名（10文字以内）",
+      "timing": "実施時期（例：1ヶ月以内）",
+      "action": "具体的なアクション（2〜3文）",
+      "effect": "期待効果（1文）"
+    }
+  ],
+  "bizplan": "事業計画の方針（3〜5文。目標達成のための戦略・方針を具体的に）",
+  "advice": "経営者へのひと言アドバイス（1〜2文。温かく背中を押す言葉）"
+}
+
+actionsは必ず5つ作成してください。最重要課題（${nayami}）に絡めた施策を中心に、実践的で具体的な内容にしてください。
+`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1500,
+        messages:[{role:'user', content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(clean);
+    renderOutput(result, {gyoshu,chiiki,jugyoin,nayami,sales,gr,g1,g3,g5,f1val,b});
+  } catch(e) {
+    $('output-loading').innerHTML = '<p style="color:red;text-align:center;">生成に失敗しました。もう一度お試しください。</p>';
+  } finally {
+    $('btn-generate').disabled = false;
+    $('btn-generate').textContent = '✨ アクションプラン・事業計画を生成する';
+  }
+}
+
+// ── 出力レンダリング ──
+function renderOutput(r, d){
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日`;
+
+  $('out-title').textContent = `事業改善計画書`;
+  $('out-meta').innerHTML =
+    `作成日：${dateStr}　／　業種：${d.gyoshu}　／　地域：${d.chiiki}　／　従業員：${d.jugyoin}<br>` +
+    `現状年間売上：${fmt(d.sales)}円　／　毎月改善目標：+${d.gr}%`;
+
+  $('out-analysis').textContent = r.analysis;
+
+  // アクションプラン
+  const actEl = $('out-actions');
+  actEl.innerHTML = '';
+  (r.actions||[]).forEach((a,i)=>{
+    actEl.innerHTML += `
+      <div class="action-plan-card">
+        <div class="apc-num">施策 ${i+1}　${a.timing}</div>
+        <div class="apc-title">${a.title}</div>
+        <div class="apc-body">${a.action}</div>
+        <div class="apc-effect">📈 ${a.effect}</div>
+      </div>`;
+  });
+
+  // 事業計画
+  $('out-bizplan').textContent = r.bizplan;
+
+  // 数値テーブル
+  $('out-numbers').innerHTML = `
+    <table class="num-table">
+      <tr><th>時点</th><th>放置シナリオ</th><th>改善シナリオ</th><th>差額</th></tr>
+      <tr><td>現状</td><td class="">${fmt(d.sales)}円</td><td>${fmt(d.sales)}円</td><td>—</td></tr>
+      <tr class="fear-row"><td>1年後（放置）</td><td>▼ ${fmt(d.f1val)}円</td><td>—</td><td>—</td></tr>
+      <tr class="goal-row"><td>1年後（改善）</td><td>—</td><td>↑ ${fmt(d.g1)}円</td><td>+${fmt(d.g1-d.f1val)}円</td></tr>
+      <tr class="goal-row"><td>3年後（改善）</td><td>—</td><td>↑ ${fmt(d.g3)}円</td><td>—</td></tr>
+      <tr class="goal-row"><td>5年後（改善）</td><td>—</td><td>↑ ${fmt(d.g5)}円</td><td>—</td></tr>
+    </table>
+    <div style="margin-top:12px;background:var(--gold);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:700;color:var(--navy);">
+      💡 ${r.advice}
+    </div>`;
+
+  $('output-loading').style.display = 'none';
+  $('output-body').style.display = 'block';
+}
+
+
 function drawChart(sales, fearData, goalData){
   const canvas = document.getElementById('salesChart');
   const dpr = window.devicePixelRatio || 1;
