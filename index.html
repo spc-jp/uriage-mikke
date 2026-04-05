@@ -492,15 +492,12 @@ function calcStep2(sales, b){
 
   $('fear-1y').textContent   = fmt(s1)+' 円';
   $('fear-1y-d').textContent = '▼'+Math.abs((f1-1)*100).toFixed(1)+'%　（-'+fmt(sales-s1)+'円）';
-  $('fear-bar-1y').style.width = Math.max(f1*100,4).toFixed(1)+'%';
 
   $('fear-3y').textContent   = fmt(s3)+' 円';
   $('fear-3y-d').textContent = '▼'+Math.abs((f3-1)*100).toFixed(1)+'%　（-'+fmt(sales-s3)+'円）';
-  $('fear-bar-3y').style.width = Math.max(f3*100,4).toFixed(1)+'%';
 
   $('fear-5y').textContent   = fmt(s5)+' 円';
   $('fear-5y-d').textContent = '▼'+Math.abs((f5-1)*100).toFixed(1)+'%　（-'+fmt(sales-s5)+'円）';
-  $('fear-bar-5y').style.width = Math.max(f5*100,4).toFixed(1)+'%';
   $('fear-lost').textContent = fmt(Math.round(b.kyaku*(1-f1)))+' 人';
 }
 
@@ -517,17 +514,14 @@ function calcStep3(sales, b){
   $('goal-1y-now').textContent = fmt(sales)+' 円';
   $('goal-1y').textContent     = fmt(g1)+' 円';
   $('goal-1y-d').textContent   = '+ '+fmt(Math.round(g1-sales))+' 円アップ';
-  $('goal-bar-1y').style.width = Math.min((g1/sales)*60, 100).toFixed(1)+'%';
 
   $('goal-3y-now').textContent = fmt(sales)+' 円';
   $('goal-3y').textContent     = fmt(g3)+' 円';
   $('goal-3y-d').textContent   = '+ '+fmt(Math.round(g3-sales))+' 円アップ';
-  $('goal-bar-3y').style.width = Math.min((g3/sales)*60, 100).toFixed(1)+'%';
 
   $('goal-5y-now').textContent = fmt(sales)+' 円';
   $('goal-5y').textContent     = fmt(g5)+' 円';
   $('goal-5y-d').textContent   = '+ '+fmt(Math.round(g5-sales))+' 円アップ';
-  $('goal-bar-5y').style.width = Math.min((g5/sales)*60, 100).toFixed(1)+'%';
 
   // サマリーバナー
   $('goal-summary-text').innerHTML =
