@@ -230,15 +230,43 @@ input[type="range"]:active::-webkit-slider-thumb{transform:scale(1.15);}
 .btn-generate:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,63,192,.4);}
 .btn-generate:disabled{background:#ccc;transform:none;box-shadow:none;cursor:not-allowed;}
 
-/* ローディング */
+/* ── ローディングアニメーション（A＋B＋C） ── */
+.ld-msg-wrap{text-align:center;margin-bottom:18px;}
+.ld-icon{font-size:36px;margin-bottom:8px;animation:icon-bounce .8s infinite ease-in-out;}
+@keyframes icon-bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.ld-msg{font-size:14px;font-weight:700;color:var(--navy);min-height:22px;transition:opacity .3s;}
+.ld-bar-wrap{
+  background:#e0e4ef;border-radius:8px;height:12px;
+  overflow:hidden;margin:0 auto;max-width:400px;
+}
+.ld-bar{
+  height:100%;width:0%;border-radius:8px;
+  background:linear-gradient(90deg,#6c3fc0,var(--gold));
+  transition:width .4s ease;
+}
+.ld-pct{text-align:center;font-size:12px;font-weight:700;color:#6c3fc0;margin-top:6px;}
 .loading-dots{display:flex;justify-content:center;gap:8px;}
 .loading-dots span{
-  width:12px;height:12px;background:#6c3fc0;border-radius:50%;
+  width:10px;height:10px;background:#6c3fc0;border-radius:50%;
   animation:dot-bounce .8s infinite ease-in-out;
 }
 .loading-dots span:nth-child(2){animation-delay:.15s;}
 .loading-dots span:nth-child(3){animation-delay:.3s;}
 @keyframes dot-bounce{0%,80%,100%{transform:scale(0.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+
+/* 出力フェードイン（案C） */
+#output-body{transition:opacity .6s ease;}
+.fade-item{
+  opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.fade-item.visible{opacity:1;transform:translateY(0);}
+.action-plan-card{
+  opacity:0;transform:translateX(-20px);
+  transition:opacity .4s ease,transform .4s ease;
+}
+.action-plan-card.visible{opacity:1;transform:translateX(0);}
+
 
 /* 出力カード */
 .output-card{border-top:3px solid #6c3fc0;}
@@ -613,42 +641,44 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
 
 <!-- ══ 出力カード ══ -->
 <div class="step-card output-card" id="output-card" style="display:none;">
-  <!-- ローディング -->
-  <div id="output-loading" style="text-align:center;padding:30px 0;">
-    <div class="loading-dots">
+
+  <!-- ══ ローディング（A＋B） ══ -->
+  <div id="output-loading" style="padding:24px 0 30px;">
+    <!-- ステップメッセージ（案A） -->
+    <div class="ld-msg-wrap">
+      <div class="ld-icon" id="ld-icon">📊</div>
+      <div class="ld-msg" id="ld-msg">売上データを分析中...</div>
+    </div>
+    <!-- プログレスバー（案B） -->
+    <div class="ld-bar-wrap">
+      <div class="ld-bar" id="ld-bar"></div>
+    </div>
+    <div class="ld-pct" id="ld-pct">0%</div>
+    <!-- ドット -->
+    <div class="loading-dots" style="margin-top:16px;">
       <span></span><span></span><span></span>
     </div>
-    <div style="margin-top:12px;font-size:13px;color:#888;">Claudeが分析中です…少々お待ちください</div>
   </div>
 
-  <!-- 出力本体 -->
-  <div id="output-body" style="display:none;">
-    <!-- ヘッダー -->
+  <!-- ══ 出力本体（案C：フェードイン） ══ -->
+  <div id="output-body" style="display:none;opacity:0;">
     <div class="out-header">
       <div class="out-title" id="out-title">事業改善計画書</div>
       <div class="out-meta" id="out-meta"></div>
     </div>
-
-    <!-- 現状サマリー -->
-    <div class="out-section">
+    <div class="out-section fade-item">
       <div class="out-sec-title">📊 現状分析</div>
       <div class="out-text" id="out-analysis"></div>
     </div>
-
-    <!-- アクションプラン -->
-    <div class="out-section">
+    <div class="out-section fade-item">
       <div class="out-sec-title">🎯 3ヶ月以内のアクションプラン</div>
       <div id="out-actions"></div>
     </div>
-
-    <!-- 事業計画 -->
-    <div class="out-section">
+    <div class="out-section fade-item">
       <div class="out-sec-title">📈 売上目標と事業計画</div>
       <div class="out-text" id="out-bizplan"></div>
     </div>
-
-    <!-- 数値計画 -->
-    <div class="out-section">
+    <div class="out-section fade-item">
       <div class="out-sec-title">💹 数値計画（シミュレーション連動）</div>
       <div id="out-numbers"></div>
     </div>
@@ -805,7 +835,28 @@ async function generatePlan(){
   $('output-card').style.display = 'block';
   $('output-loading').style.display = 'block';
   $('output-body').style.display = 'none';
+  $('output-body').style.opacity = '0';
   $('output-card').scrollIntoView({behavior:'smooth', block:'start'});
+
+  // ── アニメーションA＋B：ステップメッセージ＋プログレスバー ──
+  const steps = [
+    {icon:'📊', msg:'売上データを分析中...', pct:15},
+    {icon:'🏢', msg:'業種・特徴を読み込み中...', pct:35},
+    {icon:'🤖', msg:'Claudeが課題を診断中...', pct:55},
+    {icon:'🎯', msg:'アクションプランを作成中...', pct:75},
+    {icon:'📝', msg:'事業計画をまとめています...', pct:90},
+  ];
+  let stepIdx = 0;
+  const stepTimer = setInterval(()=>{
+    if(stepIdx < steps.length){
+      const s = steps[stepIdx];
+      $('ld-icon').textContent  = s.icon;
+      $('ld-msg').textContent   = s.msg;
+      $('ld-bar').style.width   = s.pct + '%';
+      $('ld-pct').textContent   = s.pct + '%';
+      stepIdx++;
+    }
+  }, 900);
 
   const prompt = `
 あなたは中小企業の経営改善コンサルタントです。
@@ -860,33 +911,45 @@ actionsは必ず5つ作成してください。最重要課題（${nayami}）に
     const text = data.content.map(i=>i.text||'').join('');
     const clean = text.replace(/```json|```/g,'').trim();
     const result = JSON.parse(clean);
-    renderOutput(result, {gyoshu,chiiki,jugyoin,nayami,sales,gr,g1,g3,g5,f1val,b});
+
+    // バー100%にしてから出力
+    clearInterval(stepTimer);
+    $('ld-icon').textContent = '✅';
+    $('ld-msg').textContent  = '完成しました！';
+    $('ld-bar').style.width  = '100%';
+    $('ld-pct').textContent  = '100%';
+
+    setTimeout(()=>{
+      renderOutput(result, {gyoshu,chiiki,jugyoin,nayami,sales,gr,g1,g3,g5,f1val,b});
+    }, 600);
+
   } catch(e) {
-    $('output-loading').innerHTML = '<p style="color:red;text-align:center;">生成に失敗しました。もう一度お試しください。</p>';
+    clearInterval(stepTimer);
+    $('output-loading').innerHTML = '<p style="color:red;text-align:center;padding:20px;">生成に失敗しました。もう一度お試しください。</p>';
   } finally {
     $('btn-generate').disabled = false;
     $('btn-generate').textContent = '✨ アクションプラン・事業計画を生成する';
   }
 }
 
-// ── 出力レンダリング ──
+// ── 出力レンダリング（案C：フェードイン） ──
 function renderOutput(r, d){
   const today = new Date();
   const dateStr = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日`;
 
-  $('out-title').textContent = `事業改善計画書`;
+  $('out-title').textContent = '事業改善計画書';
   $('out-meta').innerHTML =
     `作成日：${dateStr}　／　業種：${d.gyoshu}　／　地域：${d.chiiki}　／　従業員：${d.jugyoin}<br>` +
     `現状年間売上：${fmt(d.sales)}円　／　毎月改善目標：+${d.gr}%`;
 
   $('out-analysis').textContent = r.analysis;
 
-  // アクションプラン
+  // アクションプラン（スライドイン用にclassだけ付けておく）
   const actEl = $('out-actions');
   actEl.innerHTML = '';
   (r.actions||[]).forEach((a,i)=>{
     actEl.innerHTML += `
-      <div class="action-plan-card">
+      <div class="action-plan-card" data-idx="${i}">
         <div class="apc-num">施策 ${i+1}　${a.timing}</div>
         <div class="apc-title">${a.title}</div>
         <div class="apc-body">${a.action}</div>
@@ -894,14 +957,12 @@ function renderOutput(r, d){
       </div>`;
   });
 
-  // 事業計画
   $('out-bizplan').textContent = r.bizplan;
 
-  // 数値テーブル
   $('out-numbers').innerHTML = `
     <table class="num-table">
       <tr><th>時点</th><th>放置シナリオ</th><th>改善シナリオ</th><th>差額</th></tr>
-      <tr><td>現状</td><td class="">${fmt(d.sales)}円</td><td>${fmt(d.sales)}円</td><td>—</td></tr>
+      <tr><td>現状</td><td>${fmt(d.sales)}円</td><td>${fmt(d.sales)}円</td><td>—</td></tr>
       <tr class="fear-row"><td>1年後（放置）</td><td>▼ ${fmt(d.f1val)}円</td><td>—</td><td>—</td></tr>
       <tr class="goal-row"><td>1年後（改善）</td><td>—</td><td>↑ ${fmt(d.g1)}円</td><td>+${fmt(d.g1-d.f1val)}円</td></tr>
       <tr class="goal-row"><td>3年後（改善）</td><td>—</td><td>↑ ${fmt(d.g3)}円</td><td>—</td></tr>
@@ -911,8 +972,24 @@ function renderOutput(r, d){
       💡 ${r.advice}
     </div>`;
 
+  // ── フェードイン開始 ──
   $('output-loading').style.display = 'none';
   $('output-body').style.display = 'block';
+  requestAnimationFrame(()=>{
+    $('output-body').style.opacity = '1';
+
+    // セクションを順番にフェードイン
+    const items = document.querySelectorAll('.fade-item');
+    items.forEach((el,i)=>{
+      setTimeout(()=>el.classList.add('visible'), i * 180);
+    });
+
+    // アクションカードを順番にスライドイン
+    const cards = document.querySelectorAll('.action-plan-card');
+    cards.forEach((el,i)=>{
+      setTimeout(()=>el.classList.add('visible'), 400 + i * 150);
+    });
+  });
 }
 
 
