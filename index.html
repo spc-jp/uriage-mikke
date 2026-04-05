@@ -390,7 +390,7 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
 
 <header>
   <div class="h-badge">📊 SALES SIMULATOR</div>
-  <h1>売上みっけ！</h1>
+  <h1 onclick="window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer;" title="トップへ戻る">売上みっけ！</h1>
   <p>今の売上を確認 → 放置の怖さを知る → 具体的なアクションを見つける</p>
 </header>
 
@@ -705,7 +705,7 @@ footer{color:rgba(255,255,255,.3);font-size:11px;margin-top:12px;text-align:cent
 
 
 <div class="btn-row">
-  <button class="btn-reset" onclick="resetAll()">↺ リセット</button>
+  <button class="btn-reset" onclick="resetAll()">↺ リセット・トップへ</button>
   <button class="btn-print" onclick="window.print()">🖨️ 印刷・PDF保存</button>
 </div>
 <footer>Smile Plus Consulting ／ 売上みっけ！</footer>
@@ -1125,7 +1125,9 @@ function calc(){
 function resetAll(){
   $('in-kyaku').value=1000;$('in-tanka').value=5000;$('in-hindo').value=2;
   $('sl-fear').value=2;$('sl-goal').value=5;
+  $('output-card').style.display='none';
   calc();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 ['in-kyaku','in-tanka','in-hindo','sl-fear','sl-goal'].forEach(id=>{
